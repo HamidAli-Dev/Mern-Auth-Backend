@@ -13,7 +13,6 @@ import passport from "./middlewares/passport";
 import sessionRoutes from "./modules/session/session.routes";
 import { authenticateJWT } from "./common/strategies/jwt.strategy";
 import mfaRoutes from "./modules/mfa/mfa.routes";
-import path from "path";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -44,10 +43,8 @@ app.use(`${BASE_PATH}/session`, authenticateJWT, sessionRoutes);
 
 app.use(errorHandler);
 
-// run the server in local environment amd in vercel environment
-if (process.env.NODE_ENV === "development") {
-  app.listen(config.PORT, () => {
+  app.listen(config.PORT, async () => {
     console.log(`Server is running on port ${config.PORT}`);
+    await connectDB();
   });
-}
-connectDB();
+
