@@ -28,23 +28,33 @@ app.use(
 app.use(cookieParser());
 app.use(passport.initialize());
 
-app.get(
-  "/",
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    res.status(HTTPSTATUS.OK).json({
-      message: "Working!",
-    });
-  })
-);
+// Health check route
+app.get("/", (req: Request, res: Response) => {
+  res.status(HTTPSTATUS.OK).json({
+    message: "API is running!",
+    status: "healthy"
+  });
+});
 
+// API routes with BASE_PATH
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/mfa`, mfaRoutes);
 app.use(`${BASE_PATH}/session`, authenticateJWT, sessionRoutes);
 
+// API root route
+app.get(BASE_PATH, (req: Request, res: Response) => {
+  res.status(HTTPSTATUS.OK).json({
+    message: "API is working!",
+    version: "v1"
+  });
+});
+
 app.use(errorHandler);
 
-  app.listen(config.PORT, async () => {
-    console.log(`Server is running on port ${config.PORT}`);
-    await connectDB();
-  });
+// Start server
+const port = process.env.PORT || config.PORT;
+app.listen(port, async () => {
+  console.log(`Server is running on port ${port}`);
+  await connectDB();
+});
 
